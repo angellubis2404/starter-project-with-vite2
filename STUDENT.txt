@@ -1,2 +1,2 @@
-APP_URL=<https://github.com/angellubis2404/Starter-project-2--with-vite-ke-2.git>
+APP_URL=<https://angellubis2404.github.io/starter-project-with-vite2>
 MAP_SERVICE_API_KEY=<api_key>
