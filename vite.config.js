@@ -86,6 +86,48 @@ export default defineConfig({
             purpose: 'any maskable'
           },
         ],
+        screenshots: [
+          {
+            src: 'images/logo.png',
+            sizes: '1920x1080',
+            type: 'image/png',
+            form_factor: 'wide'
+          },
+          {
+            src: 'images/logo.png',
+            sizes: '1080x1920',
+            type: 'image/png',
+            form_factor: 'narrow'
+          }
+        ],
+        shortcuts: [
+          {
+            name: 'Tambah Cerita',
+            short_name: 'Tambah',
+            description: 'Membuat cerita baru.',
+            url: '/#/add-story',
+            icons: [
+              {
+                src: 'images/logo.png',
+                type: 'image/png',
+                sizes: '512x512'
+              }
+            ]
+          },
+          {
+            name: 'Beranda',
+            short_name: 'Home',
+            description: 'Lihat beranda cerita.',
+            url: '/#/',
+            icons: [
+              {
+                src: 'images/logo.png',
+                type: 'image/png',
+                sizes: '512x512'
+              }
+            ]
+          }
+        ]
       },
     }),
   ],
