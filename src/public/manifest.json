@@ -1,53 +1,55 @@
 {
   "name": "Story App",
   "short_name": "StoryApp",
-  "description": "Aplikasi untuk berbagi cerita dengan peta lokasi",
+  "description": "Aplikasi berbagi cerita dengan lokasi peta serta fitur offline.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#ffffff",
   "theme_color": "#007bff",
-  "orientation": "portrait-primary",
-  "scope": "/",
+
   "icons": [
     {
-      "src": "/favicon.png",
+      "src": "/icons/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "/favicon.png",
+      "src": "/icons/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ],
-  "screenshots": [
-    {
-      "src": "/images/logo.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide"
-    },
-    {
-      "src": "/images/logo.png",
-      "sizes": "750x1334",
-      "type": "image/png",
-      "form_factor": "narrow"
-    }
-  ],
+
   "shortcuts": [
     {
       "name": "Tambah Cerita",
       "short_name": "Tambah",
-      "description": "Tambahkan cerita baru",
+      "description": "Buat cerita baru dengan foto dan lokasi.",
       "url": "/#/add-story",
-      "icons": [{ "src": "/favicon.png", "sizes": "96x96" }]
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     },
     {
       "name": "Beranda",
       "short_name": "Home",
-      "description": "Lihat semua cerita",
+      "description": "Lihat semua cerita terbaru.",
       "url": "/#/",
-      "icons": [{ "src": "/favicon.png", "sizes": "96x96" }]
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ]
 }

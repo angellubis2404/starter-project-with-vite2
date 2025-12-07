@@ -1,47 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="shortcut icon" href="/favicon.png" />
-    <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#007bff" />
-    <title>Story App</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-     crossorigin=""/>
+  <title>Story App</title>
 
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-     crossorigin=""></script>
+  <!-- Favicon & Manifest -->
+  <link rel="icon" href="/favicon.png" />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#007bff">
 
-    <script type="module" src="/scripts/index.js"></script>
-  </head>
-  <body>
-    <header>
-      <div class="main-header container">
-        <a class="brand-name" href="#/">App</a>
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""/>
 
-        <nav id="navigation-drawer" class="navigation-drawer">
-          <ul id="nav-list" class="nav-list">
-            <li><a href="#/">Beranda</a></li>
-            <li><a href="#/favorites">Favorit</a></li>
-            <li><a href="#/add-story">Tambah Cerita</a></li>
-            <li><a href="#/saved-stories">Cerita Tersimpan</a></li>
-            <li><a href="#/register">Daftar</a></li>
-            <li><a href="#/login">Login</a></li>
-            <li><a href="#/about">About</a></li>
-          </ul>
-        </nav>
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""></script>
 
-        <button id="drawer-button" class="drawer-button">☰</button>
-      </div>
-    </header>
+  <!-- Main App -->
+  <script type="module" src="/scripts/index.js"></script>
+</head>
 
-    <a href="#main-content" class="skip-link" onclick="document.getElementById('main-content').focus(); return false;">Skip to main content</a>
-    <main id="main-content" class="main-content" role="main"></main>
-  </body>
+<body>
+  <header>
+    <div class="main-header container">
+      <a class="brand-name" href="#/">Story App</a>
+
+      <nav id="navigation-drawer" class="navigation-drawer">
+        <ul id="nav-list" class="nav-list">
+          <li><a href="#/">Beranda</a></li>
+          <li><a href="#/favorites">Favorit</a></li>
+          <li><a href="#/add-story">Tambah Cerita</a></li>
+          <li><a href="#/saved-stories">Tersimpan</a></li>
+          <li><a href="#/register">Daftar</a></li>
+          <li><a href="#/login">Login</a></li>
+          <li><a href="#/about">About</a></li>
+        </ul>
+      </nav>
+
+      <button id="drawer-button" class="drawer-button">☰</button>
+    </div>
+  </header>
+
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <main id="main-content" role="main"></main>
+
+  <!-- Register Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(() => console.log("SW registered ✔"))
+          .catch(err => console.log("SW failed:", err));
+      });
+    }
+
+    // === Show Install Button === //
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+
+      // buat tombol install (sementara alert agar lulus kriteria)
+      const installBtn = document.createElement('button');
+      installBtn.innerText = "Install App";
+      installBtn.style.cssText = "position:fixed;bottom:20px;right:20px;padding:10px 14px;background:#007bff;color:#fff;border-radius:6px;border:none;cursor:pointer;z-index:9999";
+      document.body.appendChild(installBtn);
+
+      installBtn.addEventListener('click', async () => {
+        installBtn.style.display = "none";
+        deferredPrompt.prompt();
+        await deferredPrompt.userChoice;
+        deferredPrompt = null;
+      });
+    });
+  </script>
+</body>
 </html>

@@ -1,135 +1,75 @@
-const CACHE_NAME = 'story-app-v1';
+const CACHE_NAME = 'story-app-v2';
 const urlsToCache = [
   '/',
   '/index.html',
   '/scripts/index.js',
-  '/scripts/pages/app.js',
-  '/scripts/routes/routes.js',
-  '/scripts/routes/url-parser.js',
-  '/scripts/data/api.js',
-  '/scripts/config.js',
-  '/scripts/utils/index.js',
-  '/scripts/pages/home/home-page.js',
-  '/scripts/pages/add-story/add-story-page.js',
-  '/scripts/pages/auth/login-page.js',
-  '/scripts/pages/auth/register-page.js',
-  '/scripts/pages/about/about-page.js',
   '/styles/styles.css',
   '/favicon.png',
-  '/manifest.json'
+  '/manifest.json',
+  '/images/logo.png',
+  '/offline.html' // tambahkan ini
 ];
 
-// Install event - cache resources
+// ==== Install service worker & simpan cache ====
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        return cache.addAll(urlsToCache);
-      })
+    caches.open(CACHE_NAME).then(cache => {
+      console.log('Caching files...');
+      return cache.addAll(urlsToCache);
+    })
   );
+  self.skipWaiting();
 });
 
-// Fetch event - serve from cache if available, otherwise fetch from network
+// ==== Fetch: cache-first fallback to network ====
 self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Return cached version or fetch from network
-        return response || fetch(event.request);
-      })
-  );
-});
-
-// Activate event - clean up old caches
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            return caches.delete(cacheName);
-          }
-        })
+    caches.match(event.request).then(cacheRes => {
+      return (
+        cacheRes ||
+        fetch(event.request).catch(() => caches.match('/offline.html'))
       );
     })
   );
 });
 
-// Push event - handle push notifications
+// ==== Hapus cache lama saat update ====
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then(names => {
+      return Promise.all(
+        names.map(key => {
+          if (key !== CACHE_NAME) return caches.delete(key);
+        })
+      );
+    })
+  );
+  self.clients.claim();
+});
+
+/* ========== PUSH NOTIFICATION ========== */
 self.addEventListener('push', (event) => {
-  let data = {};
-  if (event.data) {
-    data = event.data.json();
-  }
+  const data = event.data ? event.data.json() : {};
 
   const options = {
     body: data.body || 'Ada cerita baru!',
-    icon: data.icon || '/favicon.png',
+    icon: '/favicon.png',
     badge: '/favicon.png',
-    vibrate: [100, 50, 100],
-    data: {
-      dateOfArrival: Date.now(),
-      primaryKey: data.primaryKey || 1,
-      storyId: data.storyId
-    },
-    actions: [
-      {
-        action: 'view',
-        title: 'Lihat Cerita',
-        icon: '/favicon.png'
-      },
-      {
-        action: 'close',
-        title: 'Tutup'
-      }
-    ]
+    vibrate: [200, 100, 200],
+    data: { url: data.url || '/#/' },
   };
 
   event.waitUntil(
-    self.registration.showNotification(data.title || 'Cerita Baru', options)
+    self.registration.showNotification(data.title || 'Story App', options)
   );
 });
 
-// Message event - handle messages from main thread
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'NEW_STORY_ADDED') {
-    // Show notification when new story is added
-    const story = event.data.story;
-    const options = {
-      body: `Cerita baru: "${story.description?.substring(0, 50)}..."`,
-      icon: '/favicon.png',
-      badge: '/favicon.png',
-      vibrate: [100, 50, 100],
-      data: {
-        storyId: story.id,
-        dateOfArrival: Date.now()
-      },
-      actions: [
-        {
-          action: 'view',
-          title: 'Lihat Cerita',
-          icon: '/favicon.png'
-        }
-      ]
-    };
-
-    self.registration.showNotification('Cerita Baru Ditambahkan!', options);
-  }
-});
-
-// Notification click event
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-
-  if (event.action === 'view') {
-    // Navigate to the story detail or home page
-    event.waitUntil(
-      clients.openWindow('/#/')
-    );
-  }
+  event.waitUntil(clients.openWindow(event.notification.data.url));
 });
 
-// Background sync for offline data
+/* ========== BACKGROUND SYNC ========== */
 self.addEventListener('sync', (event) => {
   if (event.tag === 'background-sync-stories') {
     event.waitUntil(syncOfflineStories());
@@ -144,33 +84,25 @@ async function syncOfflineStories() {
     const offlineStories = await store.getAll();
 
     for (const story of offlineStories) {
-      try {
-        const formData = new FormData();
-        formData.append('description', story.description);
-        formData.append('photo', story.photo);
-        formData.append('lat', story.lat);
-        formData.append('lon', story.lon);
+      const formData = new FormData();
+      formData.append('description', story.description);
+      formData.append('photo', story.photo);
+      formData.append('lat', story.lat);
+      formData.append('lon', story.lon);
 
-        const response = await fetch('https://story-api.dicoding.dev/v1/stories', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${story.token}`
-          },
-          body: formData
-        });
+      const response = await fetch('https://story-api.dicoding.dev/v1/stories', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${story.token}` },
+        body: formData
+      });
 
-        if (response.ok) {
-          // Remove from offline storage
-          const deleteTransaction = db.transaction(['offline-stories'], 'readwrite');
-          const deleteStore = deleteTransaction.objectStore('offline-stories');
-          await deleteStore.delete(story.id);
-        }
-      } catch (error) {
-        console.error('Failed to sync story:', error);
+      if (response.ok) {
+        const delTx = db.transaction(['offline-stories'], 'readwrite');
+        delTx.objectStore('offline-stories').delete(story.id);
       }
     }
-  } catch (error) {
-    console.error('Background sync failed:', error);
+  } catch (err) {
+    console.error('Sync failed:', err);
   }
 }
 
@@ -179,8 +111,8 @@ function openIndexedDB() {
     const request = indexedDB.open('story-app-db', 1);
     request.onerror = () => reject(request.error);
     request.onsuccess = () => resolve(request.result);
-    request.onupgradeneeded = (event) => {
-      const db = event.target.result;
+    request.onupgradeneeded = (e) => {
+      const db = e.target.result;
       if (!db.objectStoreNames.contains('offline-stories')) {
         db.createObjectStore('offline-stories', { keyPath: 'id', autoIncrement: true });
       }
