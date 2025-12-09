@@ -7,7 +7,7 @@ class FavoritesPage {
   }
 
   async render() {
-    this.container.innerHTML = `
+    return `
       <div class="favorites-page">
         <h2>Cerita Favorit</h2>
         <div id="favorites-list" class="stories-list">
@@ -15,7 +15,9 @@ class FavoritesPage {
         </div>
       </div>
     `;
+  }
 
+  async afterRender() {
     await this.loadFavorites();
   }
 
