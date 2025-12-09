@@ -37,6 +37,17 @@ class App {
 
   async renderPage() {
     const url = getActiveRoute();
+    const token = localStorage.getItem('token');
+
+    // Daftar rute yang harus diproteksi
+    const protectedRoutes = ['/add-story', '/favorites'];
+
+    // Redirect ke login jika mengakses rute privat tanpa token
+    if (protectedRoutes.includes(url) && !token) {
+      location.hash = '#/login';
+      return;
+    }
+
     const page = routes[url];
 
     // Alternative DOM update for browsers that do not support view transition
