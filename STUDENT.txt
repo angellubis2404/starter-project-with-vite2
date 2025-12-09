@@ -1,2 +1,2 @@
-APP_URL=<https://angellubis2404.github.io/starter-project-with-vite2>
+APP_URL= https://lucent-cassata-d934ba.netlify.app/
 MAP_SERVICE_API_KEY=<api_key>
