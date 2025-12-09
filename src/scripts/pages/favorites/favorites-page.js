@@ -35,15 +35,18 @@ class FavoritesPage {
 
       favoritesList.innerHTML = '';
 
-      // For each favorite ID, we need to get the story data
-      // Since favorites only store IDs, we'll show them with a note
-      favorites.forEach(favId => {
+      // Get full story data for favorites
+      const favoriteStories = await this.dbManager.getStoriesByIds(favorites);
+
+      favoriteStories.forEach(story => {
         const favElement = document.createElement('div');
         favElement.className = 'story-item favorite-item';
         favElement.innerHTML = `
-          <p>Story ID: ${favId}</p>
-          <p><em>Data lengkap cerita akan ditampilkan saat online</em></p>
-          <button class="remove-favorite-btn" data-id="${favId}">Hapus dari Favorit</button>
+          <img src="${story.photoUrl}" alt="${story.name}" style="max-width: 200px;">
+          <h3>${story.name || 'Anonymous'}</h3>
+          <p>${story.description || ''}</p>
+          <p><small>${new Date(story.createdAt).toLocaleString()}</small></p>
+          <button class="remove-favorite-btn" data-id="${story.id}">Hapus dari Favorit</button>
         `;
         favoritesList.appendChild(favElement);
       });

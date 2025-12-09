@@ -46,15 +46,9 @@ class SavedStoriesPage {
       // Display favorites
       if (favorites.length > 0) {
         storiesList.innerHTML += '<h3>Cerita Favorit</h3>';
-        // Note: Favorites only store IDs, so we would need to fetch the actual story data
-        // For now, just show the IDs
-        favorites.forEach(favId => {
-          const favElement = document.createElement('div');
-          favElement.className = 'story-item favorite-item';
-          favElement.innerHTML = `
-            <p>Story ID: ${favId}</p>
-            <button class="remove-favorite-btn" data-id="${favId}">Hapus dari Favorit</button>
-          `;
+        const favoriteStories = await this.dbManager.getStoriesByIds(favorites);
+        favoriteStories.forEach(story => {
+          const favElement = this.createStoryElement(story, true);
           storiesList.appendChild(favElement);
         });
       }

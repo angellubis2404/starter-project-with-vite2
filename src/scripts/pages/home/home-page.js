@@ -58,20 +58,7 @@ export default class HomePage {
   }
 
   _checkAuthentication() {
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (user) {
-      const navList = document.querySelector('.nav-list');
-      const logoutLink = document.createElement('li');
-      logoutLink.innerHTML = `<a href="#" id="logout-link">Logout (${user.name})</a>`;
-      navList.appendChild(logoutLink);
-
-      document.getElementById('logout-link').addEventListener('click', (e) => {
-        e.preventDefault();
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        window.location.hash = '#/login';
-      });
-    }
+    // Authentication handling is now done globally in app.js
   }
 
   _renderStories() {

@@ -38,6 +38,7 @@ class App {
   async renderPage() {
     const url = getActiveRoute();
     const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user'));
 
     // Daftar rute yang harus diproteksi
     const protectedRoutes = ['/add-story', '/favorites'];
@@ -46,6 +47,41 @@ class App {
     if (protectedRoutes.includes(url) && !token) {
       location.hash = '#/login';
       return;
+    }
+
+    // Hide/Show navbar auth links based on login status
+    const navList = document.getElementById('nav-list');
+    if (navList) {
+      const authLinks = navList.querySelectorAll('li:nth-child(3), li:nth-child(4)');
+      if (user) {
+        // Hide login and register links
+        authLinks.forEach(link => link.style.display = 'none');
+        // Add logout link if not already present
+        if (!document.getElementById('logout-link')) {
+          const logoutLink = document.createElement('li');
+          logoutLink.innerHTML = `<a href="#" id="logout-link">Logout (${user.name})</a>`;
+          navList.appendChild(logoutLink);
+
+          document.getElementById('logout-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            // Show login and register links again
+            authLinks.forEach(link => link.style.display = 'block');
+            // Remove logout link
+            logoutLink.remove();
+            window.location.hash = '#/login';
+          });
+        }
+      } else {
+        // Show login and register links
+        authLinks.forEach(link => link.style.display = 'block');
+        // Remove logout link if present
+        const logoutLink = document.getElementById('logout-link');
+        if (logoutLink) {
+          logoutLink.remove();
+        }
+      }
     }
 
     const page = routes[url];

@@ -92,6 +92,25 @@ class IndexedDBManager {
     });
   }
 
+  async getStoriesByIds(ids) {
+    const transaction = this.db.transaction(['stories'], 'readonly');
+    const store = transaction.objectStore('stories');
+    const stories = [];
+    for (const id of ids) {
+      const request = store.get(id);
+      await new Promise((resolve, reject) => {
+        request.onsuccess = () => {
+          if (request.result) {
+            stories.push(request.result);
+          }
+          resolve();
+        };
+        request.onerror = () => reject(request.error);
+      });
+    }
+    return stories;
+  }
+
   async toggleFavorite(storyId) {
     const transaction = this.db.transaction(['favorites'], 'readwrite');
     const store = transaction.objectStore('favorites');
