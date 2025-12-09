@@ -4,7 +4,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
   root: resolve(__dirname, 'src'),
-  publicDir: resolve(__dirname, 'public'), // <-- pindahkan ke public utama (bukan src/public)
+  publicDir: resolve(__dirname, 'src/public'),
   build: {
     outDir: resolve(__dirname, 'dist'),
     emptyOutDir: true,
@@ -68,8 +68,8 @@ export default defineConfig({
 
         // path asset PWA harus absolute path dan dalam /public
         icons: [
-          { src: '/images/logo.png', sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
-          { src: '/images/logo.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+          { src: '/images/logo.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: '/images/logo.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }
         ],
 
         screenshots: [
