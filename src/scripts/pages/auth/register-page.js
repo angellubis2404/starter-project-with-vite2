@@ -36,21 +36,32 @@ export default class RegisterPage {
   }
 
   _setupForm() {
-    const form = document.getElementById('login-form');
+    const form = document.getElementById('register-form');
+    if (!form) {
+      console.error('Register form not found');
+      return;
+    }
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
+      console.log('Form submitted');
+
       const formData = new FormData(form);
       const data = Object.fromEntries(formData);
+      console.log('Form data:', data);
 
       try {
         const result = await registerUser(data);
+        console.log('API response:', result);
+
         if (result.error === false) {
           document.getElementById('message').textContent = 'Pendaftaran berhasil! Silakan login.';
           window.location.hash = '#/login';
         } else {
-          document.getElementById('message').textContent = 'Pendaftaran gagal. Periksa data Anda.';
+          document.getElementById('message').textContent = result.message || 'Pendaftaran gagal. Periksa data Anda.';
         }
       } catch (error) {
+        console.error('Registration error:', error);
         document.getElementById('message').textContent = 'Terjadi kesalahan. Silakan coba lagi.';
       }
     });

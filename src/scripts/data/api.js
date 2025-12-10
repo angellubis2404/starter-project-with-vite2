@@ -6,15 +6,17 @@ const ENDPOINTS = {
 
 export async function getStories(token) {
   try {
-    const response = await fetch(ENDPOINTS.STORIES, {
-      headers: token ? {
-        'Authorization': `Bearer ${token}`,
-      } : {},
+    const response = await fetch(`${ENDPOINTS.STORIES}?location=1`, {
+      headers: token
+        ? {
+            Authorization: `Bearer ${token}`,
+          }
+        : {},
     });
     const data = await response.json();
     return data.listStory || [];
   } catch (error) {
-    console.error('Error fetching stories:', error);
+    console.error("Error fetching stories:", error);
     return [];
   }
 }

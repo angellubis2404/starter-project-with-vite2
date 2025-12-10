@@ -373,4 +373,27 @@ a:focus {
   outline: 2px solid #007bff;
   outline-offset: 2px;
 }
+
+/* Navigation visibility based on login status */
+.logged-in .nav-list li:nth-child(2),
+.logged-in .nav-list li:nth-child(3),
+.logged-in .nav-list li:nth-child(4) {
+  display: block;
+}
+
+.logged-in .nav-list li:nth-child(5),
+.logged-in .nav-list li:nth-child(6) {
+  display: none;
+}
+
+.logged-out .nav-list li:nth-child(2),
+.logged-out .nav-list li:nth-child(3),
+.logged-out .nav-list li:nth-child(4) {
+  display: none;
+}
+
+.logged-out .nav-list li:nth-child(5),
+.logged-out .nav-list li:nth-child(6) {
+  display: block;
+}
 }

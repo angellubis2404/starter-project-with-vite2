@@ -73,6 +73,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     drawerButton: document.querySelector('#drawer-button'),
     navigationDrawer: document.querySelector('#navigation-drawer'),
   });
+
+  // Initialize navigation visibility based on login status
+  const user = JSON.parse(localStorage.getItem('user'));
+  if (user) {
+    document.body.classList.add('logged-in');
+  } else {
+    document.body.classList.add('logged-out');
+  }
+
   await app.renderPage();
 
   window.addEventListener('hashchange', async () => {
