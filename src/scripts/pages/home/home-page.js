@@ -1,7 +1,6 @@
 import { getStories } from '../../data/api.js';
 import CONFIG from '../../config.js';
 import IndexedDBManager from '../../utils/indexed-db.js';
-import PushNotificationManager from '../../utils/push-notification.js';
 
 export default class HomePage {
   async render() {
@@ -33,9 +32,6 @@ export default class HomePage {
     console.log('HomePage afterRender called');
     this.dbManager = new IndexedDBManager();
     await this.dbManager.init();
-
-    this.pushManager = new PushNotificationManager();
-    await this.pushManager.init();
 
     const token = localStorage.getItem('token');
     try {
@@ -222,15 +218,15 @@ export default class HomePage {
   _setupNotificationToggle() {
     const toggleButton = document.getElementById('notification-toggle');
     if (toggleButton) {
-      const isSubscribed = this.pushManager.getSubscriptionStatus();
+      const isSubscribed = window.pushManager.getSubscriptionStatus();
       toggleButton.textContent = isSubscribed ? '🔕 Disable Notifications' : '🔔 Enable Notifications';
 
       toggleButton.addEventListener('click', async () => {
-        if (this.pushManager.getSubscriptionStatus()) {
-          await this.pushManager.unsubscribe();
+        if (window.pushManager.getSubscriptionStatus()) {
+          await window.pushManager.unsubscribe();
           toggleButton.textContent = '🔔 Enable Notifications';
         } else {
-          await this.pushManager.subscribe();
+          await window.pushManager.subscribe();
           toggleButton.textContent = '🔕 Disable Notifications';
         }
       });

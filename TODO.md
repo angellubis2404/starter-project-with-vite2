@@ -1,25 +1,18 @@
-# TODO List for Fixing App Issues and Implementing Requirements
+# TODO: Fix Push Notification Implementation
 
-## 1. Fix API Authentication
-- [x] Update `getStories` in `src/scripts/data/api.js` to include Authorization header with token
+## Current Issue
+- Push notifications are only initialized in home-page.js, causing them to not work globally.
+- Status shows active but no notifications appear when pushed.
 
-## 2. Implement Page Transitions
-- [x] Implement View Transitions API in `src/scripts/pages/app.js` for SPA page transitions
+## Plan
+1. Move PushNotificationManager initialization from home-page.js to index.js for global availability.
+2. Update home-page.js to use the global instance instead of creating a new one.
+3. Ensure notification toggle works across the app.
+4. Test that existing PWA, IndexedDB, and other features remain intact.
 
-## 3. Enhance Accessibility
-- [x] Add ARIA labels and roles in HTML templates
-- [x] Ensure keyboard navigation support
-- [x] Improve screen reader compatibility
-- [x] Fix heading hierarchy (h1 → h2 → h3) in all pages
-- [x] Implement proper skip to content link
-
-## 4. Fix Navigation and UI Issues
-- [x] Hide register and login links after successful login
-- [x] Add logout functionality
-- [x] Fill About page with application description
-
-## 5. Test and Verify
-- [ ] Test login and data display on homepage
-- [ ] Verify map markers display correctly
-- [ ] Check add story feature works
-- [ ] Validate accessibility with tools
+## Steps
+- [ ] Initialize PushNotificationManager globally in index.js
+- [ ] Remove local initialization from home-page.js
+- [ ] Update home-page.js to reference global push manager
+- [ ] Verify service worker push event handling
+- [ ] Test notification functionality

@@ -2,6 +2,10 @@
 import '../styles/styles.css';
 
 import App from './pages/app';
+import PushNotificationManager from './utils/push-notification.js';
+
+// Global push notification manager
+window.pushManager = new PushNotificationManager();
 
 document.addEventListener('DOMContentLoaded', async () => {
   // Register service worker
@@ -15,6 +19,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const permission = await Notification.requestPermission();
         console.log('Notification permission:', permission);
       }
+
+      // Initialize push notifications
+      await window.pushManager.init();
+      console.log('Push notifications initialized');
     } catch (error) {
       console.error('Service Worker registration failed:', error);
     }
