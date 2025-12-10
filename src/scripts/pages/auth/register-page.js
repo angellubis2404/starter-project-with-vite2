@@ -6,63 +6,71 @@ export default class RegisterPage {
       <section class="container">
         <h1>Daftar</h1>
         <h2>Form Pendaftaran</h2>
-        <form id="register-form" aria-labelledby="register-title">
+
+        <form id="register-form">
           <div>
             <label for="name">Nama:</label>
-            <input type="text" id="name" name="name" required aria-describedby="name-help">
-            <span id="name-help" class="sr-only">Masukkan nama lengkap Anda</span>
+            <input type="text" id="name" name="name" required>
           </div>
+
           <div>
             <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required aria-describedby="email-help">
-            <span id="email-help" class="sr-only">Masukkan alamat email Anda</span>
+            <input type="email" id="email" name="email" required>
           </div>
+
           <div>
             <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required aria-describedby="password-help">
-            <span id="password-help" class="sr-only">Masukkan kata sandi Anda</span>
+            <input type="password" id="password" name="password" minlength="6" required>
+            <small>Minimal 6 karakter</small>
           </div>
-          <button type="submit" aria-describedby="register-help">Daftar</button>
-          <span id="register-help" class="sr-only">Buat akun baru</span>
+
+          <button type="submit">Daftar</button>
         </form>
-        <div id="message" role="status" aria-live="polite"></div>
+
+        <p id="message" style="margin-top:10px;font-weight:bold;"></p>
+
         <p>Sudah punya akun? <a href="#/login">Login di sini</a></p>
       </section>
     `;
   }
 
   async afterRender() {
-    this._setupForm();
-  }
-
-  _setupForm() {
     const form = document.getElementById('register-form');
-    if (!form) {
-      console.error('Register form not found');
-      return;
-    }
+    const msg = document.getElementById('message');
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      console.log('Form submitted');
+      msg.textContent = "Memproses pendaftaran...";
 
-      const formData = new FormData(form);
-      const data = Object.fromEntries(formData);
-      console.log('Form data:', data);
+      const data = {
+        name: form.name.value.trim(),
+        email: form.email.value.trim(),
+        password: form.password.value.trim(),
+      };
+
+      if (data.password.length < 6) {
+        msg.textContent = "Password minimal 6 karakter!";
+        msg.style.color = "red";
+        return;
+      }
 
       try {
         const result = await registerUser(data);
-        console.log('API response:', result);
+        console.log("API Response:", result);
 
-        if (result.error === false) {
-          document.getElementById('message').textContent = 'Pendaftaran berhasil! Silakan login.';
-          window.location.hash = '#/login';
+        if (!result.error) {
+          msg.textContent = "Pendaftaran berhasil! Mengarahkan ke login...";
+          msg.style.color = "green";
+          setTimeout(() => (window.location.hash = "#/login"), 1200);
         } else {
-          document.getElementById('message').textContent = result.message || 'Pendaftaran gagal. Periksa data Anda.';
+          msg.textContent = result.message;
+          msg.style.color = "red";
         }
-      } catch (error) {
-        console.error('Registration error:', error);
-        document.getElementById('message').textContent = 'Terjadi kesalahan. Silakan coba lagi.';
+
+      } catch (err) {
+        console.error("Registration Error:", err);
+        msg.textContent = "Terjadi kesalahan pada server. Coba lagi nanti.";
+        msg.style.color = "red";
       }
     });
   }

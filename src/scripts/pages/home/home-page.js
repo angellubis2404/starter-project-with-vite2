@@ -2,6 +2,7 @@ import { getStories } from '../../data/api.js';
 import CONFIG from '../../config.js';
 import IndexedDBManager from '../../utils/indexed-db.js';
 
+
 export default class HomePage {
   async render() {
     return `
@@ -28,30 +29,45 @@ export default class HomePage {
     `;
   }
 
-  async afterRender() {
-    console.log('HomePage afterRender called');
-    this.dbManager = new IndexedDBManager();
-    await this.dbManager.init();
+async afterRender() {
+  console.log('HomePage afterRender called');
+  this.dbManager = new IndexedDBManager();
+  await this.dbManager.init();
 
-    const token = localStorage.getItem('token');
-    try {
-      this.stories = await getStories(token);
-      // Cache stories in IndexedDB for offline use
-      await this.dbManager.saveStoriesToCache(this.stories);
-    } catch (error) {
-      // Load from IndexedDB if offline
-      this.stories = await this.dbManager.getAllStories();
-    }
+  const token = localStorage.getItem('token');
 
-    this.favorites = await this.dbManager.getFavorites();
-
-    this._renderStories();
-    this._initializeMap();
-    this._setupFilter();
-    this._setupFavorites();
-    this._setupNotificationToggle();
-    this._checkAuthentication();
+  if (!token) {
+    console.warn("⚠ Token tidak ditemukan. User belum login!");
+    document.getElementById("story-list").innerHTML = `
+      <p style="color:red;">Silakan login terlebih dahulu untuk melihat cerita 📌</p>
+    `;
+    return;
   }
+
+  try {
+    this.stories = await getStories(token);
+    await this.dbManager.saveStoriesToCache(this.stories);
+    console.log("Stories fetched:", this.stories.length);
+  } catch (error) {
+    console.error("❌ Error mengambil data stories:", error);
+    this.stories = await this.dbManager.getAllStories();
+
+    if (!this.stories.length) {
+      document.getElementById("story-list").innerHTML = `
+        <p style="color:red;">Gagal memuat data stories dan tidak ada cache tersedia ❗</p>
+      `;
+      return;
+    }
+  }
+
+  this.favorites = await this.dbManager.getFavorites();
+
+  this._renderStories();
+  this._initializeMap();
+  this._setupFilter();
+  this._setupFavorites();
+  this._setupNotificationToggle();
+}
 
   _checkAuthentication() {
     // Authentication handling is now done globally in app.js

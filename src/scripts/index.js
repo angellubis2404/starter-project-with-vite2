@@ -1,3 +1,16 @@
+// Leaflet import penting!
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
+// Fix ikon marker bawaan Leaflet agar tidak broken (WAJIB saat build Vite)
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+L.Marker.prototype.options.icon = L.icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+});
+
 // CSS imports
 import '../styles/styles.css';
 
